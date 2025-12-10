@@ -124,8 +124,8 @@ fun MenuButton(
         modifier = modifier
             .aspectRatio(1f)
             .clip(RoundedCornerShape(20.dp))
-            .background(Color(0xFFFDD738)) // Alterar cor
-            .clickable { /* Ação do botão */ }
+            .background(Color(0xFFFDD738)) // lembrar de mudar essa cor talvez nao sei
+            .clickable { }
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center

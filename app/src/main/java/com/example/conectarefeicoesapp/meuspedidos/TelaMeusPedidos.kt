@@ -1,4 +1,4 @@
-package com.example.conectarefeicoesapp.pedido
+package com.example.conectarefeicoesapp.meuspedidos
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -74,7 +75,11 @@ fun TelaMeusPedidos(navController: NavController, viewModel: MeusPedidosViewMode
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("Filtrar por item...") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Ícone de busca") },
-                singleLine = true
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFFFDD738),
+                    cursorColor = Color(0xFFFDD738)
+                )
             )
             Spacer(modifier = Modifier.height(16.dp))
             LazyColumn(

@@ -21,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,6 +30,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -133,6 +135,10 @@ fun TelaCadastrar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFFFDD738),
+                    cursorColor = Color(0xFFFDD738)
+                ),
                 placeholder = { Text("Ex: Tirar a cebola") }
             )
             Button(
@@ -143,7 +149,11 @@ fun TelaCadastrar(
                 enabled = !uiState.isLoading && uiState.selectedItems.isNotEmpty(),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp)
+                    .padding(vertical = 16.dp),
+                colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFFDD738),
+                contentColor = Color.Black
+            )
             ) {
                 Text(if (uiState.isNewPedido) "Fazer Pedido" else "Salvar Alterações")
             }

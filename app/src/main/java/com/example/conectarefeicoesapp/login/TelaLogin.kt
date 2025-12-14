@@ -1,4 +1,4 @@
-package com.example.conectarefeicoesapp
+package com.example.conectarefeicoesapp.login
 
 import android.widget.Toast
 import androidx.compose.foundation.background

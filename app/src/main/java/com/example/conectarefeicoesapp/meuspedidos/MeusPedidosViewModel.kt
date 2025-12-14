@@ -1,9 +1,10 @@
-package com.example.conectarefeicoesapp.pedido
+package com.example.conectarefeicoesapp.meuspedidos
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.conectarefeicoesapp.Model.Pedido
+import com.example.conectarefeicoesapp.pedido.PedidoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +21,7 @@ class MeusPedidosViewModel : ViewModel() {
     val searchText = _searchText.asStateFlow()
 
     private val _allPedidos: StateFlow<List<Pedido>> = repository.getPedidos()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+        .stateIn(viewModelScope, SharingStarted.Companion.WhileSubscribed(5000), emptyList())
 
     val pedidos: StateFlow<List<Pedido>> = searchText
         .combine(_allPedidos) { text, pedidos ->
@@ -36,7 +37,7 @@ class MeusPedidosViewModel : ViewModel() {
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.Companion.WhileSubscribed(5000),
             initialValue = _allPedidos.value
         )
 

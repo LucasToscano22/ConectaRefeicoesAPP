@@ -1,7 +1,6 @@
 package com.example.conectarefeicoesapp
 
 import TelaHome
-import TelaLogin
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,8 +17,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.conectarefeicoesapp.login.TelaLogin
 import com.example.conectarefeicoesapp.pedido.TelaCadastrar
-import com.example.conectarefeicoesapp.pedido.TelaMeusPedidos
+import com.example.conectarefeicoesapp.meuspedidos.TelaMeusPedidos
 import com.example.conectarefeicoesapp.ui.theme.ConectaRefeicoesAPPTheme
 
 class MainActivity : ComponentActivity() {

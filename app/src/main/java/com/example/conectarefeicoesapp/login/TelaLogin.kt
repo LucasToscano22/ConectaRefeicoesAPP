@@ -1,3 +1,6 @@
+package com.example.conectarefeicoesapp.login
+
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -11,9 +14,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Person
@@ -35,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
@@ -43,21 +49,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Icon
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.conectarefeicoesapp.Model.Usuario
+import com.example.conectarefeicoesapp.Model.UsuarioHolder
 
 @Composable
 fun TelaLogin(navController: NavController) {
     var cpfOrEmail by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var rememberMe by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp)
-            .background(Color.White),
+            .background(Color.White)
+            .verticalScroll(rememberScrollState())
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -78,7 +85,6 @@ fun TelaLogin(navController: NavController) {
         }
 
         Spacer(modifier = Modifier.height(48.dp))
-
 
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
@@ -104,7 +110,6 @@ fun TelaLogin(navController: NavController) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
 
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
@@ -133,7 +138,6 @@ fun TelaLogin(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -152,7 +156,14 @@ fun TelaLogin(navController: NavController) {
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = { navController.navigate("home") },
+            onClick = {
+                if (cpfOrEmail == "carlos.p@dpp.com" && password == "senha123") {
+                    UsuarioHolder.currentUser = Usuario(id = "1", login = cpfOrEmail)
+                    navController.navigate("home")
+                } else {
+                    Toast.makeText(context, "Login ou senha inválidos", Toast.LENGTH_SHORT).show()
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(60.dp),

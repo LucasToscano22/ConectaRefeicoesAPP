@@ -2,59 +2,89 @@ package com.example.conectarefeicoesapp.pedido
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.conectarefeicoesapp.Model.Cardapio
 import com.example.conectarefeicoesapp.Model.Item
 import com.example.conectarefeicoesapp.Model.Pedido
 import com.example.conectarefeicoesapp.Model.Secao
-import com.example.conectarefeicoesapp.Model.mockCardapio
-import com.example.conectarefeicoesapp.Model.mockPedidos
+import com.example.conectarefeicoesapp.Model.UsuarioHolder
+import com.example.conectarefeicoesapp.cardapio.CardapioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class PedidoUiState(
-    val pedidoId: Long? = null,
+    val pedidoId: String? = null,
     val selectedItems: List<Item> = emptyList(),
     val observacao: String = "",
-    val isNewPedido: Boolean = true
+    val isNewPedido: Boolean = true,
+    val cardapio: Cardapio? = null,
+    val isLoading: Boolean = true
 )
 
 class PedidoViewModel : ViewModel() {
 
+    private val pedidoRepository = PedidoRepository()
+    private val cardapioRepository = CardapioRepository()
+
     private val _uiState = MutableStateFlow(PedidoUiState())
     val uiState: StateFlow<PedidoUiState> = _uiState.asStateFlow()
 
-    fun loadPedido(pedidoId: String?) {
-        val id = pedidoId?.toLongOrNull()
-        if (id != null) {
-            val pedidoToLoad = mockPedidos.find { it.id == id }
-            if (pedidoToLoad != null) {
+    init {
+        loadCardapio()
+    }
+
+    private fun loadCardapio() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            cardapioRepository.getCardapio().collect { cardapioFromRepo ->
                 _uiState.update {
                     it.copy(
-                        pedidoId = pedidoToLoad.id,
-                        selectedItems = pedidoToLoad.itens,
-                        observacao = pedidoToLoad.observacao,
-                        isNewPedido = false
+                        cardapio = cardapioFromRepo,
+                        isLoading = false
                     )
                 }
-            } else {
-                 _uiState.value = PedidoUiState()
+            }
+        }
+    }
+
+    fun loadPedido(pedidoId: String?) {
+        if (pedidoId != null) {
+            viewModelScope.launch {
+                _uiState.update { it.copy(isLoading = true) }
+                val pedido = pedidoRepository.getPedido(pedidoId)
+                if (pedido != null) {
+                    _uiState.update {
+                        it.copy(
+                            pedidoId = pedido.id,
+                            selectedItems = pedido.itens,
+                            observacao = pedido.observacao,
+                            isNewPedido = false,
+                            isLoading = false
+                        )
+                    }
+                } else {
+                    _uiState.update { it.copy(isLoading = false, isNewPedido = true, pedidoId = null, selectedItems = emptyList(), observacao = "") }
+                }
             }
         } else {
-            _uiState.value = PedidoUiState()
+            _uiState.update { it.copy(isNewPedido = true, pedidoId = null, selectedItems = emptyList(), observacao = "") }
         }
     }
 
     fun onItemClick(item: Item, secao: Secao) {
+        val cardapio = _uiState.value.cardapio ?: return
         val currentSelected = _uiState.value.selectedItems.toMutableList()
         val itemsInCategory = currentSelected.filter { selected ->
-            mockCardapio.secoes.any { s -> s.categoria == secao.categoria && s.itens.contains(selected) }
+            cardapio.secoes.any { s -> s.categoria == secao.categoria && s.itens.contains(selected) }
         }
 
         if (currentSelected.contains(item)) {
             currentSelected.remove(item)
         } else {
-            if (itemsInCategory.size < secao.categoria.restricaoNumerica) {
+            if (secao.categoria != null && itemsInCategory.size < secao.categoria.restricaoNumerica) {
                 currentSelected.add(item)
             }
         }
@@ -66,29 +96,26 @@ class PedidoViewModel : ViewModel() {
     }
 
     fun savePedido() {
-        val currentPedidoState = _uiState.value
+        viewModelScope.launch {
+            val currentPedidoState = _uiState.value
+            val userId = UsuarioHolder.currentUser?.id?.toLongOrNull() ?: 0L
 
-        if (currentPedidoState.isNewPedido) {
-            val newId = (mockPedidos.maxOfOrNull { it.id } ?: 0L) + 1
-            val newPedido = Pedido(
-                id = newId,
-                id_requester = 123L,
+            val pedidoToSave = Pedido(
+                id = currentPedidoState.pedidoId ?: "",
+                id_requester = userId,
                 itens = currentPedidoState.selectedItems,
                 observacao = currentPedidoState.observacao
             )
-            mockPedidos.add(newPedido)
-            Log.d("PedidoViewModel", "Salvando NOVO pedido: $newPedido")
-        } else {
-            val index = mockPedidos.indexOfFirst { it.id == currentPedidoState.pedidoId }
-            if (index != -1) {
-                val updatedPedido = mockPedidos[index].copy(
-                    itens = currentPedidoState.selectedItems,
-                    observacao = currentPedidoState.observacao
-                )
-                mockPedidos[index] = updatedPedido
-                Log.d("PedidoViewModel", "Atualizando pedido EXISTENTE: $updatedPedido")
-            } else {
-                Log.e("PedidoViewModel", "Erro: Pedido para atualização não encontrado com id: ${currentPedidoState.pedidoId}")
+
+            try {
+                pedidoRepository.savePedido(pedidoToSave)
+                if (currentPedidoState.isNewPedido) {
+                    Log.d("PedidoViewModel", "Salvando NOVO pedido: $pedidoToSave")
+                } else {
+                    Log.d("PedidoViewModel", "Atualizando pedido EXISTENTE: $pedidoToSave")
+                }
+            } catch (e: Exception) {
+                Log.e("PedidoViewModel", "Erro ao salvar pedido", e)
             }
         }
     }

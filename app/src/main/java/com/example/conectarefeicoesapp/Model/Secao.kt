@@ -1,3 +1,7 @@
 package com.example.conectarefeicoesapp.Model
 
-data class Secao(val id: Long, val categoria: Categoria, val itens: ArrayList<Item>)
+data class Secao(
+    val id:Long = 0L,
+    val categoria: Categoria? = null,
+    val itens: List<Item> = emptyList<Item>()
+)

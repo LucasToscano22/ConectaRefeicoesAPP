@@ -1,7 +1,6 @@
 package com.example.conectarefeicoesapp
 
 import TelaHome
-import TelaLogin
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent

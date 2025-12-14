@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material3.HorizontalDivider
@@ -38,6 +40,7 @@ fun TelaHome(navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
+            .verticalScroll(rememberScrollState())
             .padding(24.dp)
     ) {
         Text(
@@ -66,7 +69,7 @@ fun TelaHome(navController: NavController) {
 
             MenuButton(
                 text = "Meus\nPedidos",
-                iconResId = R.drawable.fazer_pedido,
+                iconResId = R.drawable.healthy_food,
                 modifier = Modifier.weight(1f),
                 onClick = { navController.navigate("meus_pedidos") } 
             )

@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -49,7 +50,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.conectarefeicoesapp.Model.Cardapio
 import com.example.conectarefeicoesapp.Model.Item
 import com.example.conectarefeicoesapp.Model.Secao
-import com.example.conectarefeicoesapp.Model.mockCardapio
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,11 +98,28 @@ fun TelaCadastrar(
                 thickness = 1.dp,
                 color = Color.Black
             )
-            MountMenu(
-                menu = mockCardapio,
-                selectedItems = uiState.selectedItems,
-                onItemClick = viewModel::onItemClick
-            )
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                    Text(text = "Carregando...", modifier = Modifier.padding(top = 8.dp))
+                }
+            } else if (uiState.cardapio == null) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                     Text(text = "Não foi possível carregar o cardápio.")
+                }
+            } else {
+                MountMenu(
+                    menu = uiState.cardapio!!,
+                    selectedItems = uiState.selectedItems,
+                    onItemClick = viewModel::onItemClick
+                )
+            }
 
             Text(
                 text = "Observação",
@@ -123,6 +140,7 @@ fun TelaCadastrar(
                     viewModel.savePedido()
                     navController.popBackStack()
                 },
+                enabled = !uiState.isLoading && uiState.selectedItems.isNotEmpty(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp)
@@ -194,19 +212,21 @@ fun MountMenu(
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
             ) {
-                Text(
-                    text = secao.categoria.descricao,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Text(
-                    text = "Selecionados: $selectedCount de ${secao.categoria.restricaoNumerica}",
-                    fontSize = 14.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
+                secao.categoria?.let { categoria ->
+                    Text(
+                        text = categoria.descricao,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = "Selecionados: $selectedCount de ${categoria.restricaoNumerica}",
+                        fontSize = 14.sp,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
                 secao.itens.chunked(3).forEach { rowItems ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),

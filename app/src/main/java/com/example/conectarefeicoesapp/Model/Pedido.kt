@@ -1,8 +1,11 @@
 package com.example.conectarefeicoesapp.Model
 
+import com.google.firebase.firestore.DocumentId
+
+
 data class Pedido(
-    val id: Long,
-    val id_requester: Long,
-    val itens: List<Item>,
-    val observacao: String
+    @DocumentId var id: String = "",
+    val id_requester: Long = 0L,
+    val itens: List<Item> = emptyList<Item>(),
+    val observacao: String = ""
 )

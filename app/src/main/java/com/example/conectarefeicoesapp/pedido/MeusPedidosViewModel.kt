@@ -4,20 +4,23 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.conectarefeicoesapp.Model.Pedido
-import com.example.conectarefeicoesapp.Model.mockPedidos
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class MeusPedidosViewModel : ViewModel() {
+
+    private val repository = PedidoRepository()
 
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
 
-    private val _allPedidos = MutableStateFlow<List<Pedido>>(emptyList())
+    private val _allPedidos: StateFlow<List<Pedido>> = repository.getPedidos()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val pedidos: StateFlow<List<Pedido>> = searchText
         .combine(_allPedidos) { text, pedidos ->
@@ -37,21 +40,18 @@ class MeusPedidosViewModel : ViewModel() {
             initialValue = _allPedidos.value
         )
 
-    init {
-        carregarPedidos()
-    }
-
-    private fun carregarPedidos() {
-        _allPedidos.value = mockPedidos
-    }
-
     fun onSearchTextChange(text: String) {
         _searchText.value = text
     }
 
     fun cancelarPedido(pedido: Pedido) {
-        mockPedidos.remove(pedido)
-        carregarPedidos()
-        Log.d("MeusPedidosViewModel", "Pedido cancelado: ${pedido.id}")
+        viewModelScope.launch {
+            try {
+                repository.deletePedido(pedido.id)
+                Log.d("MeusPedidosViewModel", "Pedido cancelado: ${pedido.id}")
+            } catch (e: Exception) {
+                Log.e("MeusPedidosViewModel", "Erro ao cancelar o pedido: ${pedido.id}", e)
+            }
+        }
     }
 }

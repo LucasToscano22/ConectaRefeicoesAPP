@@ -67,7 +67,8 @@ fun TelaHome(navController: NavController) {
             MenuButton(
                 text = "Meus\nPedidos",
                 iconResId = R.drawable.fazer_pedido,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                onClick = { navController.navigate("meus_pedidos") } 
             )
         }
 

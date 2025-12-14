@@ -6,7 +6,7 @@ import com.example.conectarefeicoesapp.Model.Item
 import com.example.conectarefeicoesapp.Model.Pedido
 import com.example.conectarefeicoesapp.Model.Secao
 import com.example.conectarefeicoesapp.Model.mockCardapio
-import com.example.conectarefeicoesapp.Model.mockPedido
+import com.example.conectarefeicoesapp.Model.mockPedidos
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,17 +25,20 @@ class PedidoViewModel : ViewModel() {
     val uiState: StateFlow<PedidoUiState> = _uiState.asStateFlow()
 
     fun loadPedido(pedidoId: String?) {
-        if (pedidoId != null) {
-            // In a real app, you would fetch this from a repository/database
-            if (pedidoId == mockPedido.id.toString()) {
+        val id = pedidoId?.toLongOrNull()
+        if (id != null) {
+            val pedidoToLoad = mockPedidos.find { it.id == id }
+            if (pedidoToLoad != null) {
                 _uiState.update {
                     it.copy(
-                        pedidoId = mockPedido.id,
-                        selectedItems = mockPedido.itens,
-                        observacao = mockPedido.observacao,
+                        pedidoId = pedidoToLoad.id,
+                        selectedItems = pedidoToLoad.itens,
+                        observacao = pedidoToLoad.observacao,
                         isNewPedido = false
                     )
                 }
+            } else {
+                 _uiState.value = PedidoUiState()
             }
         } else {
             _uiState.value = PedidoUiState()
@@ -64,17 +67,29 @@ class PedidoViewModel : ViewModel() {
 
     fun savePedido() {
         val currentPedidoState = _uiState.value
-        val pedidoToSave = Pedido(
-            id = currentPedidoState.pedidoId ?: 0L, // Use existing ID or 0 for new
-            id_requester = 123L, // Placeholder
-            itens = currentPedidoState.selectedItems,
-            observacao = currentPedidoState.observacao
-        )
 
         if (currentPedidoState.isNewPedido) {
-            Log.d("PedidoViewModel", "Salvando NOVO pedido: $pedidoToSave")
+            val newId = (mockPedidos.maxOfOrNull { it.id } ?: 0L) + 1
+            val newPedido = Pedido(
+                id = newId,
+                id_requester = 123L,
+                itens = currentPedidoState.selectedItems,
+                observacao = currentPedidoState.observacao
+            )
+            mockPedidos.add(newPedido)
+            Log.d("PedidoViewModel", "Salvando NOVO pedido: $newPedido")
         } else {
-            Log.d("PedidoViewModel", "Atualizando pedido EXISTENTE: $pedidoToSave")
+            val index = mockPedidos.indexOfFirst { it.id == currentPedidoState.pedidoId }
+            if (index != -1) {
+                val updatedPedido = mockPedidos[index].copy(
+                    itens = currentPedidoState.selectedItems,
+                    observacao = currentPedidoState.observacao
+                )
+                mockPedidos[index] = updatedPedido
+                Log.d("PedidoViewModel", "Atualizando pedido EXISTENTE: $updatedPedido")
+            } else {
+                Log.e("PedidoViewModel", "Erro: Pedido para atualização não encontrado com id: ${currentPedidoState.pedidoId}")
+            }
         }
     }
 }

@@ -121,7 +121,7 @@ fun TelaCadastrar(
             Button(
                 onClick = { 
                     viewModel.savePedido()
-                    navController.popBackStack() // Navigate back after saving
+                    navController.popBackStack()
                 },
                 modifier = Modifier
                     .fillMaxWidth()

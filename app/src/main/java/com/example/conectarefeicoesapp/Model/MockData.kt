@@ -25,9 +25,17 @@ val mockSecoes = arrayListOf(
 
 val mockCardapio = Cardapio(1, mockSecoes)
 
-val mockPedido = Pedido(
-    id = 1L,
-    id_requester = 123L,
-    itens = listOf(mockItems[3], mockItems[0], mockItems[6]), // Bife, Arroz, Purê de Batata
-    observacao = "Bife bem passado, por favor."
+val mockPedidos = arrayListOf(
+    Pedido(
+        id = 1L,
+        id_requester = 123L,
+        itens = listOf(mockItems[3], mockItems[0], mockItems[6]), 
+        observacao = "Bife bem passado, por favor."
+    ),
+    Pedido(
+        id = 2L,
+        id_requester = 123L,
+        itens = listOf(mockItems[1], mockItems[2], mockItems[4]),
+        observacao = "Macarrão bem passado, por favor."
+    )
 )

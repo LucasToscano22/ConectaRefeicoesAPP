@@ -19,6 +19,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.conectarefeicoesapp.pedido.TelaCadastrar
+import com.example.conectarefeicoesapp.pedido.TelaMeusPedidos
 import com.example.conectarefeicoesapp.ui.theme.ConectaRefeicoesAPPTheme
 
 class MainActivity : ComponentActivity() {
@@ -33,6 +34,7 @@ class MainActivity : ComponentActivity() {
                         NavHost(navController = navController, startDestination = "login") {
                             composable("login") { TelaLogin(navController) }
                             composable("home") { TelaHome(navController) }
+                            composable("meus_pedidos") { TelaMeusPedidos(navController) }
                             composable(
                                 route = "cadastrar?pedidoId={pedidoId}",
                                 arguments = listOf(navArgument("pedidoId") {

@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun TelaLogin() {

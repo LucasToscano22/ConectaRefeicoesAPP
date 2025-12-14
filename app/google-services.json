@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "187400094068",
+    "project_id": "conecta-refeicoesapp",
+    "storage_bucket": "conecta-refeicoesapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:187400094068:android:90b7c962f998bb7301ac21",
+        "android_client_info": {
+          "package_name": "com.example.conectarefeicoesapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA84NyN2e5HHLjoxUMDiu396ohzPe5d-8U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

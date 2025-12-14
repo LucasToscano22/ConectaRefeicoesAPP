@@ -43,6 +43,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun TelaLogin(navController: NavController) {

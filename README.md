@@ -18,12 +18,12 @@ Facilitar a experiência do funcionário no processo de solicitação de refeiç
 
 ## 👥 Equipe de Desenvolvimento
 
-- JoaoPedro-MAAR
-- Androka2004
-- **LucasToscano22**
+- **João Pedro Marques**
+- **Andrey Coutinho**
+- **Lucas Toscano**
 
 ## 📌 Observações
 
-Este projeto faz parte do ecossistema **Conecta Refeições**, integrando-se com os demais módulos do sistema.
+Este projeto faz parte do ecossistema **[Conecta Refeições](https://github.com/Androka2004/Conecta-Refeicoes)**, integrando-se com os demais módulos do sistema.
 
 ---

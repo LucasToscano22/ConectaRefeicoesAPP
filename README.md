@@ -18,9 +18,9 @@ Facilitar a experiência do funcionário no processo de solicitação de refeiç
 
 ## 👥 Equipe de Desenvolvimento
 
-- **João Pedro Marques**
-- **Andrey Coutinho**
-- **Lucas Toscano**
+- JoaoPedro-MAAR
+- Androka2004
+- **LucasToscano22**
 
 ## 📌 Observações
 

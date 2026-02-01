@@ -2,34 +2,54 @@ package com.example.conectarefeicoesapp.cardapio
 
 import android.util.Log
 import com.example.conectarefeicoesapp.Model.Cardapio
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.snapshots
-import com.google.firebase.firestore.toObject
+import com.example.conectarefeicoesapp.Model.Categoria
+import com.example.conectarefeicoesapp.Model.Item
+import com.example.conectarefeicoesapp.Model.Secao
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flow
 
 class CardapioRepository {
 
-    private val db = Firebase.firestore
-    private val cardapiosCollection = db.collection("cardapios")
+    fun getCardapio(): Flow<Cardapio?> = flow {
+        try {
+            Log.d("CardapioRepository", "Iniciando busca na API...")
 
-    fun getCardapio(): Flow<Cardapio?> {
-        return cardapiosCollection.limit(1).snapshots().map { snapshot ->
-            Log.w(snapshot.toString(), "Menu document found: ${snapshot.documents.first().id}")
-            if (snapshot.isEmpty) {
-                Log.w("CardapioRepository", "No menu document found in 'cardapios' collection.")
-                null
-            } else {
-                val document = snapshot.documents.first()
-                Log.d("CardapioRepository", "Menu document found: ${document.id}")
-                try {
-                    document.toObject<Cardapio>()
-                } catch (e: Exception) {
-                    Log.e("CardapioRepository", "Error converting menu document to Cardapio object.", e)
-                    null
-                }
+            // 1. Chama a API
+            val menuDto = RetrofitClient.service.getCardapioPadrao()
+
+            Log.d("CardapioRepository", "API retornou cardápio: ${menuDto.nome}")
+
+            // 2. Converte os dados
+            val secoesConvertidas = menuDto.categorias.map { categoriaDto ->
+                Secao(
+                    id = categoriaDto.id,
+                    categoria = Categoria(
+                        id = categoriaDto.id,
+                        descricao = categoriaDto.nome,
+                        restricaoNumerica = categoriaDto.limiteMaximoEscolhas
+                    ),
+                    itens = categoriaDto.itens.map { itemDto ->
+                        Item(
+                            id = itemDto.id,
+                            descricao = itemDto.nome
+                            // Removi a linha 'selecionado = false' pois ela não existe no seu Modelo
+                        )
+                    }
+                )
             }
+
+            // 3. Monta o objeto final
+            val cardapioFinal = Cardapio(
+                id = menuDto.id.toString(),
+                secoes = secoesConvertidas
+            )
+
+            emit(cardapioFinal)
+
+        } catch (e: Exception) {
+            Log.e("CardapioRepository", "ERRO DE API: ${e.message}")
+            e.printStackTrace()
+            emit(null)
         }
     }
 }

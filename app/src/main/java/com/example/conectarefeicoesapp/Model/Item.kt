@@ -1,4 +1,9 @@
 package com.example.conectarefeicoesapp.Model
 
-
-data class Item(val id: Long = 0L, var descricao: String = "")
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+@Entity(tableName = "itens")
+data class Item(
+    @PrimaryKey val id: Long = 0L,
+    var descricao: String = "",
+    var categoriaOwnerId: Long = 0L)

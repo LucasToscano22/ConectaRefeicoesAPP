@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 
 data class PedidoUiState(
     val pedidoId: String? = null,
@@ -24,10 +26,10 @@ data class PedidoUiState(
     val isLoading: Boolean = true
 )
 
-class PedidoViewModel : ViewModel() {
+class PedidoViewModel(application: Application) : AndroidViewModel(application) {
 
     private val pedidoRepository = PedidoRepository()
-    private val cardapioRepository = CardapioRepository()
+    private val cardapioRepository = CardapioRepository(application.applicationContext)
 
     private val _uiState = MutableStateFlow(PedidoUiState())
     val uiState: StateFlow<PedidoUiState> = _uiState.asStateFlow()

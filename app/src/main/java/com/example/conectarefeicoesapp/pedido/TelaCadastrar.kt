@@ -46,19 +46,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.conectarefeicoesapp.Model.Cardapio
 import com.example.conectarefeicoesapp.Model.Item
 import com.example.conectarefeicoesapp.Model.Secao
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelaCadastrar(
     navController: NavController,
     pedidoId: String?,
-    viewModel: PedidoViewModel = viewModel()
+    viewModel: PedidoViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

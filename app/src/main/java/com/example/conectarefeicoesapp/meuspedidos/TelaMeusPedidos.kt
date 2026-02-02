@@ -39,15 +39,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.conectarefeicoesapp.Model.Pedido
 import com.example.conectarefeicoesapp.R
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TelaMeusPedidos(navController: NavController, viewModel: MeusPedidosViewModel = viewModel()) {
+fun TelaMeusPedidos(navController: NavController, viewModel: MeusPedidosViewModel = koinViewModel()) {
     val pedidos by viewModel.pedidos.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
 

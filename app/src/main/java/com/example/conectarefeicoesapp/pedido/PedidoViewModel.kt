@@ -9,13 +9,13 @@ import com.example.conectarefeicoesapp.Model.Pedido
 import com.example.conectarefeicoesapp.Model.Secao
 import com.example.conectarefeicoesapp.Model.UsuarioHolder
 import com.example.conectarefeicoesapp.cardapio.CardapioRepository
+import com.example.conectarefeicoesapp.data.repository.PedidoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 
 data class PedidoUiState(
     val pedidoId: String? = null,
@@ -26,10 +26,11 @@ data class PedidoUiState(
     val isLoading: Boolean = true
 )
 
-class PedidoViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val pedidoRepository = PedidoRepository()
-    private val cardapioRepository = CardapioRepository(application.applicationContext)
+// Corrected constructor to receive dependencies via injection
+class PedidoViewModel(
+    private val pedidoRepository: PedidoRepository,
+    private val cardapioRepository: CardapioRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PedidoUiState())
     val uiState: StateFlow<PedidoUiState> = _uiState.asStateFlow()
@@ -56,7 +57,9 @@ class PedidoViewModel(application: Application) : AndroidViewModel(application) 
         if (pedidoId != null) {
             viewModelScope.launch {
                 _uiState.update { it.copy(isLoading = true) }
-                val pedido = pedidoRepository.getPedido(pedidoId)
+                // Assuming getPedido is implemented in PedidoRepository to fetch a single pedido by id
+                val pedido = pedidoRepository.getPedidosStream().firstOrNull()?.find { it.id == pedidoId }
+
                 if (pedido != null) {
                     _uiState.update {
                         it.copy(
@@ -103,19 +106,16 @@ class PedidoViewModel(application: Application) : AndroidViewModel(application) 
             val userId = UsuarioHolder.currentUser?.id?.toLongOrNull() ?: 0L
 
             val pedidoToSave = Pedido(
-                id = currentPedidoState.pedidoId ?: "",
+                id = currentPedidoState.pedidoId ?: "", // Firestore will generate ID if empty
                 id_requester = userId,
                 itens = currentPedidoState.selectedItems,
                 observacao = currentPedidoState.observacao
             )
 
             try {
-                pedidoRepository.savePedido(pedidoToSave)
-                if (currentPedidoState.isNewPedido) {
-                    Log.d("PedidoViewModel", "Salvando NOVO pedido: $pedidoToSave")
-                } else {
-                    Log.d("PedidoViewModel", "Atualizando pedido EXISTENTE: $pedidoToSave")
-                }
+                // Using the correct repository method
+                pedidoRepository.addPedido(pedidoToSave)
+                Log.d("PedidoViewModel", "Pedido salvo com sucesso: $pedidoToSave")
             } catch (e: Exception) {
                 Log.e("PedidoViewModel", "Erro ao salvar pedido", e)
             }

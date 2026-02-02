@@ -1,5 +1,4 @@
-package com.example.conectarefeicoesapp.cardapio
-
+package com.example.conectarefeicoesapp.data.local
 
 import androidx.room.Dao
 import androidx.room.Insert

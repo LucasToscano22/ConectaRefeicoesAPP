@@ -1,23 +1,18 @@
 package com.example.conectarefeicoesapp.cardapio
 
-import android.content.Context
 import android.util.Log
-import com.example.conectarefeicoesapp.Model.AppDatabase
 import com.example.conectarefeicoesapp.Model.Cardapio
 import com.example.conectarefeicoesapp.Model.Categoria
 import com.example.conectarefeicoesapp.Model.Item
 import com.example.conectarefeicoesapp.Model.Secao
+import com.example.conectarefeicoesapp.data.local.CardapioDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-// Adicionei o Context no construtor para pegar o banco
-class CardapioRepository(context: Context) {
-
-    private val cardapioDao = AppDatabase.getDatabase(context).cardapioDao()
+class CardapioRepository(private val cardapioDao: CardapioDao) {
 
     fun getCardapio(): Flow<Cardapio?> = flow {
         // 1. EMITIR DADOS DO CACHE (ROOM) IMEDIATAMENTE
-        // Tenta buscar do banco local
         val categoriasLocais = cardapioDao.getCategorias()
 
         if (categoriasLocais.isNotEmpty()) {

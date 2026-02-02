@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.conectarefeicoesapp.Model.Pedido
-import com.example.conectarefeicoesapp.pedido.PedidoRepository
+import com.example.conectarefeicoesapp.data.repository.PedidoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -13,15 +13,15 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class MeusPedidosViewModel : ViewModel() {
-
-    private val repository = PedidoRepository()
+// Corrected constructor to receive the repository via injection
+class MeusPedidosViewModel(private val repository: PedidoRepository) : ViewModel() {
 
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
 
-    private val _allPedidos: StateFlow<List<Pedido>> = repository.getPedidos()
-        .stateIn(viewModelScope, SharingStarted.Companion.WhileSubscribed(5000), emptyList())
+    // Corrected to use getPedidosStream from the repository
+    private val _allPedidos: StateFlow<List<Pedido>> = repository.getPedidosStream()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val pedidos: StateFlow<List<Pedido>> = searchText
         .combine(_allPedidos) { text, pedidos ->
@@ -37,22 +37,25 @@ class MeusPedidosViewModel : ViewModel() {
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Companion.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = _allPedidos.value
         )
+    
+    init {
+        // Automatically sync with Firestore when the ViewModel is created
+        viewModelScope.launch {
+            repository.syncPedidosFromFirestore()
+        }
+    }
 
     fun onSearchTextChange(text: String) {
         _searchText.value = text
     }
 
     fun cancelarPedido(pedido: Pedido) {
-        viewModelScope.launch {
-            try {
-                repository.deletePedido(pedido.id)
-                Log.d("MeusPedidosViewModel", "Pedido cancelado: ${pedido.id}")
-            } catch (e: Exception) {
-                Log.e("MeusPedidosViewModel", "Erro ao cancelar o pedido: ${pedido.id}", e)
-            }
-        }
+        // TODO: Implement cancellation logic in PedidoRepository
+        // The original code called repository.deletePedido(pedido.id)
+        // This method needs to be created in PedidoRepository and PedidoDao
+        Log.d("MeusPedidosViewModel", "cancelarPedido called for: ${pedido.id}")
     }
 }

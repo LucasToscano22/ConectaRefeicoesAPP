@@ -6,17 +6,22 @@ import com.example.conectarefeicoesapp.Model.Categoria
 import com.example.conectarefeicoesapp.Model.Item
 import com.example.conectarefeicoesapp.Model.Secao
 import com.example.conectarefeicoesapp.data.local.CardapioDao
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
-class CardapioRepository(private val cardapioDao: CardapioDao) {
+class CardapioRepository(
+    private val cardapioDao: CardapioDao,
+    private val apiService: ConectaApiService
+) {
 
     fun getCardapio(): Flow<Cardapio?> = flow {
-        // 1. EMITIR DADOS DO CACHE (ROOM) IMEDIATAMENTE
         val categoriasLocais = cardapioDao.getCategorias()
 
         if (categoriasLocais.isNotEmpty()) {
             Log.d("CardapioRepository", "Carregando do ROOM (Cache)")
+
             val secoesLocais = categoriasLocais.map { cat ->
                 Secao(
                     id = cat.id,
@@ -27,17 +32,15 @@ class CardapioRepository(private val cardapioDao: CardapioDao) {
             emit(Cardapio(id = "cache_local", secoes = secoesLocais))
         }
 
-        // 2. BUSCAR DA API E ATUALIZAR O CACHE
         try {
             Log.d("CardapioRepository", "Buscando da API (Internet)...")
-            val menuDto = RetrofitClient.service.getCardapioPadrao()
 
-            // Prepara as listas para salvar no Room
+            val menuDto = apiService.getCardapioPadrao()
+
             val listaCategorias = mutableListOf<Categoria>()
             val listaItens = mutableListOf<Item>()
 
             val secoesConvertidas = menuDto.categorias.map { categoriaDto ->
-                // Cria objeto Categoria
                 val novaCategoria = Categoria(
                     id = categoriaDto.id,
                     descricao = categoriaDto.nome,
@@ -45,12 +48,11 @@ class CardapioRepository(private val cardapioDao: CardapioDao) {
                 )
                 listaCategorias.add(novaCategoria)
 
-                // Cria objetos Item e vincula à categoria (Flattening)
                 val itensDestaCategoria = categoriaDto.itens.map { itemDto ->
                     val novoItem = Item(
                         id = itemDto.id,
                         descricao = itemDto.nome,
-                        categoriaOwnerId = novaCategoria.id // VINCULO IMPORTANTE
+                        categoriaOwnerId = novaCategoria.id
                     )
                     listaItens.add(novoItem)
                     novoItem
@@ -63,11 +65,9 @@ class CardapioRepository(private val cardapioDao: CardapioDao) {
                 )
             }
 
-            // SALVA NO ROOM (Atualiza o cache)
             cardapioDao.atualizarCardapio(listaCategorias, listaItens)
             Log.d("CardapioRepository", "Cache atualizado com sucesso!")
 
-            // Emite o dado novo que veio da API
             val cardapioFinal = Cardapio(
                 id = menuDto.id.toString(),
                 secoes = secoesConvertidas
@@ -75,9 +75,8 @@ class CardapioRepository(private val cardapioDao: CardapioDao) {
             emit(cardapioFinal)
 
         } catch (e: Exception) {
-            Log.e("CardapioRepository", "ERRO DE API: ${e.message}. Exibindo apenas cache (se houver).")
-            // Se der erro na API, o usuário continua vendo o cache emitido no passo 1
+            Log.e("CardapioRepository", "ERRO DE API: ${e.message}. Exibindo apenas cache.")
             if (categoriasLocais.isEmpty()) emit(null)
         }
-    }
+    }.flowOn(Dispatchers.IO)
 }

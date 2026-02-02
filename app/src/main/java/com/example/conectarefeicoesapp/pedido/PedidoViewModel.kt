@@ -26,7 +26,6 @@ data class PedidoUiState(
     val isLoading: Boolean = true
 )
 
-// Corrected constructor to receive dependencies via injection
 class PedidoViewModel(
     private val pedidoRepository: PedidoRepository,
     private val cardapioRepository: CardapioRepository
@@ -106,14 +105,13 @@ class PedidoViewModel(
             val userId = UsuarioHolder.currentUser?.id?.toLongOrNull() ?: 0L
 
             val pedidoToSave = Pedido(
-                id = currentPedidoState.pedidoId ?: "", // Firestore will generate ID if empty
+                id = currentPedidoState.pedidoId ?: "",
                 id_requester = userId,
                 itens = currentPedidoState.selectedItems,
                 observacao = currentPedidoState.observacao
             )
 
             try {
-                // Using the correct repository method
                 pedidoRepository.addPedido(pedidoToSave)
                 Log.d("PedidoViewModel", "Pedido salvo com sucesso: $pedidoToSave")
             } catch (e: Exception) {

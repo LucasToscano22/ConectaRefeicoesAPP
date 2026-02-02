@@ -9,12 +9,10 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class LoginViewModel : ViewModel() {
 
-    // Estado para gerenciar o que a UI deve fazer (Navegar, Mostrar Erro ou Ficar Parada)
     private val _uiState = MutableStateFlow<LoginState>(LoginState.Idle)
     val uiState: StateFlow<LoginState> = _uiState.asStateFlow()
 
     fun validarLogin(email: String, pass: String) {
-        // Lógica de validação (Fake Login) movida da View para a ViewModel
         if (email == "carlos.p@dpp.com" && pass == "senha123") {
             UsuarioHolder.currentUser = Usuario(id = "1", login = email)
             _uiState.value = LoginState.Success

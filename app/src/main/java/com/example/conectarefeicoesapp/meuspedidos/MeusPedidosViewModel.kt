@@ -19,7 +19,6 @@ class MeusPedidosViewModel(private val repository: PedidoRepository) : ViewModel
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
 
-    // Corrected to use getPedidosStream from the repository
     private val _allPedidos: StateFlow<List<Pedido>> = repository.getPedidosStream()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -42,7 +41,6 @@ class MeusPedidosViewModel(private val repository: PedidoRepository) : ViewModel
         )
     
     init {
-        // Automatically sync with Firestore when the ViewModel is created
         viewModelScope.launch {
             repository.syncPedidosFromFirestore()
         }
@@ -53,9 +51,6 @@ class MeusPedidosViewModel(private val repository: PedidoRepository) : ViewModel
     }
 
     fun cancelarPedido(pedido: Pedido) {
-        // TODO: Implement cancellation logic in PedidoRepository
-        // The original code called repository.deletePedido(pedido.id)
-        // This method needs to be created in PedidoRepository and PedidoDao
         Log.d("MeusPedidosViewModel", "cancelarPedido called for: ${pedido.id}")
     }
 }

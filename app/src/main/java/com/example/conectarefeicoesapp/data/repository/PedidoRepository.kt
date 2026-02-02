@@ -12,12 +12,10 @@ class PedidoRepository(
     private val firestore: FirebaseFirestore
 ) {
 
-    // A UI vai consumir este Flow. Ele vem direto do Room (rápido e offline)
     fun getPedidosStream(): Flow<List<Pedido>> {
         return pedidoDao.getPedidos()
     }
 
-    // Função para sincronizar dados do Firestore para o Room
     suspend fun syncPedidosFromFirestore() {
         try {
             Log.d("PedidoRepository", "Sincronizando pedidos do Firestore...")

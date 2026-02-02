@@ -51,22 +51,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.conectarefeicoesapp.pedido.PedidoViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun TelaLogin(navController: NavController,
-              viewModel: LoginViewModel = koinViewModel()
+fun TelaLogin(
+    navController: NavController,
+    viewModel: LoginViewModel = koinViewModel<LoginViewModel>()
 ) {
     var cpfOrEmail by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var rememberMe by remember { mutableStateOf(false) }
+
     val uiState by viewModel.uiState.collectAsState()
+
     val context = LocalContext.current
 
-    // Reage à mudança de estado (Efeito colateral)
-    LaunchedEffect(loginState) {
-        when (state = loginState) {
+    LaunchedEffect(uiState) {
+        when (val state = uiState) {
             is LoginState.Success -> {
                 navController.navigate("home")
                 viewModel.resetState()
@@ -177,12 +178,7 @@ fun TelaLogin(navController: NavController,
 
         Button(
             onClick = {
-                if (cpfOrEmail == "carlos.p@dpp.com" && password == "senha123") {
-                    UsuarioHolder.currentUser = Usuario(id = "1", login = cpfOrEmail)
-                    navController.navigate("home")
-                } else {
-                    Toast.makeText(context, "Login ou senha inválidos", Toast.LENGTH_SHORT).show()
-                }
+                viewModel.validarLogin(cpfOrEmail, password)
             },
             modifier = Modifier
                 .fillMaxWidth()

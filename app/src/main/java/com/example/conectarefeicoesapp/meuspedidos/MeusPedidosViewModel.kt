@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-// Corrected constructor to receive the repository via injection
 class MeusPedidosViewModel(private val repository: PedidoRepository) : ViewModel() {
 
     private val _searchText = MutableStateFlow("")

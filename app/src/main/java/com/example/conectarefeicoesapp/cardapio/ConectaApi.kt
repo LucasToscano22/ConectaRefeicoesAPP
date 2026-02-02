@@ -22,7 +22,7 @@ data class ItemDto(
 )
 
 interface ConectaApiService {
-    @GET("conecta-restaurante/menu/active") // Pegando o cardápio fixo ID 67
+    @GET("conecta-restaurante/menu/active") 
     suspend fun getCardapioPadrao(): MenuDto
 }
 

@@ -56,7 +56,6 @@ class PedidoViewModel(
         if (pedidoId != null) {
             viewModelScope.launch {
                 _uiState.update { it.copy(isLoading = true) }
-                // Assuming getPedido is implemented in PedidoRepository to fetch a single pedido by id
                 val pedido = pedidoRepository.getPedidosStream().firstOrNull()?.find { it.id == pedidoId }
 
                 if (pedido != null) {
